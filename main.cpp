@@ -21,7 +21,7 @@ int read(string nfile)
     {
         // displaying content
         cout << word << count << endl;
-        count++;
+        count++;//conta mais uma do que o que dev
     }
      cout << count << endl;
     return 0;
