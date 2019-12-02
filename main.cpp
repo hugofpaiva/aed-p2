@@ -2,32 +2,28 @@
 #include <iostream>
 #include <fstream>
 
-
-//  wc SherlockHolmes.txt  shell command count words by space
+// wc SherlockHolmes.txt  shell command count words by space
 using namespace std;
 
-int read(const char* nfile)
+int read(string nfile)
 {
-    ifstream file;
-    file.open(nfile);
-    char output[100];
+
+    // filestream variable file
+    fstream file;
+    string word;
     int count;
-    if (file.is_open())
+
+    // opening file
+    file.open(nfile);
+
+    // extracting words from the file
+    while (file >> word)
     {
-        count = 0;
-        while (!file.eof()) //eof - end of file
-        {
-            file >> output;
-            cout << output << " " << count << endl;
-            count++;
-        }
-        file.close();
-    }else{
-        perror("Erro ao ler o ficheiro!\n");
-        return EXIT_FAILURE;
+        // displaying content
+        cout << word << count << endl;
+        count++;
     }
-    
-    cout << count << endl;
+     cout << count << endl;
     return 0;
 }
 
