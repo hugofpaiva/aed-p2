@@ -10,5 +10,5 @@ all:		main
 run_all:	all
 	./main
 
-main:	main.cpp main.h
+main:	main.cpp
 	c++ -Wall -O2 main.cpp -o $@

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+
+//  wc SherlockHolmes.txt  shell command count words by space
 using namespace std;
 
 int read(const char* nfile)
@@ -16,7 +18,7 @@ int read(const char* nfile)
         while (!file.eof()) //eof - end of file
         {
             file >> output;
-            cout << output << endl;
+            cout << output << " " << count << endl;
             count++;
         }
         file.close();
@@ -31,8 +33,6 @@ int read(const char* nfile)
 
 int main(int argc, char const *argv[])
 {
-
-    cout << "Hello World!" << endl;
     read("SherlockHolmes.txt");
     return 0;
 }
