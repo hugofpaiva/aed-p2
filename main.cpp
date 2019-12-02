@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void read(const char* nfile)
+int read(const char* nfile)
 {
     ifstream file;
     file.open(nfile);
@@ -16,14 +16,17 @@ void read(const char* nfile)
         while (!file.eof()) //eof - end of file
         {
             file >> output;
-     ∆       cout << output << endl;
+            cout << output << endl;
             count++;
         }
         file.close();
+    }else{
+        perror("Erro ao ler o ficheiro!\n");
+        return EXIT_FAILURE;
     }
     
-    
     cout << count << endl;
+    return 0;
 }
 
 int main(int argc, char const *argv[])
