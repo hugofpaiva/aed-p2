@@ -33,19 +33,14 @@ unsigned int hash_function(const char *str, unsigned int s)
 }
 
 void add_ele(w_ele * *words, file_data_t *f){
-int count =f->word_num;
-int start= f->word_pos;
-int end = f->current_pos;
-char word[64];
-strcpy(word, f->word);
-int index = hash_function(word,500);
+int index = hash_function(f->word,500);
 w_ele * w = malloc(sizeof(w_ele));
-strcpy(w->word, word);
+strcpy(w->word, f->word);
 w->count++;
 words[index]=w;
 if(index==473){
     w_ele * x = words[473];
-    printf("%s\n", x->word);
+    printf("%s\n %d", x->word, x->count);
 }
 
 }
@@ -102,6 +97,9 @@ int main(int argc, char *argv[])
 {
     printf("Manda Nudes Laranjo\n");
     w_ele * words[500];
+    if(words[473]==NULL){
+    printf("ok");
+}
     file_data_t *f = malloc(sizeof(file_data_t));
     if (!open_text_file("test.txt", f))
     {
@@ -111,5 +109,9 @@ int main(int argc, char *argv[])
         add_ele(words,f);
         }
     }
+    w_ele * w = words[473];
+    printf("ok\n");
+    printf("%s", w->word);
     //printf("Contador de palavras: %ld     Indice do inicio da palavra atual(em todo o texto): %ld    Indice do final da palavra atual(em todo o texto): %ld\n", f->word_num, f->word_pos, f->current_pos);
+    //Falta método para verificar se o elemento da linkedlist está vazio!
 }
