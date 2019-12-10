@@ -5,10 +5,10 @@
 These instructions will help to compile and run developed programs on your local machine.
 
 ### Prerequisites
-To compile programs, it is necessary to have a C++ compiler installed on your local machine, for example cc. 
+To compile programs, it is necessary to have a C compiler installed on your local machine, for example cc. 
 
 ### Compiling
-The following command **compiles main program** (*main.cpp*) where <executable_filename>  will be the executable filename: 
+The following command **compiles main program** (*main.c*) where <executable_filename>  will be the executable filename: 
 
 ```
 
