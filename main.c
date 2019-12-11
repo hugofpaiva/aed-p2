@@ -52,22 +52,35 @@ void add_ele(w_ele **words, file_data_t *f)
             actual->count++;
         }
         else
-        { //se não for igual
+        { //se não for igual vou percorrer os next elements para ver se há algum igual
             bool found = false;
-           while (actual->next != NULL)
+            while (actual->next != NULL)
             {
                 actual = actual->next;
                 if (strcmp(actual->word, f->word) == 0)
                 { // se for igual
 
                     actual->count++;
-                    found=true;
+                    found = true;
                     break;
                 }
-                
             }
-            if(!found){
-
+            if (found) //verificar que nenhum foi encontrado
+            {
+                w_ele *temp = malloc(sizeof(w_ele));
+                strcpy(temp->word, f->word);
+                temp->valid = true;
+                temp->first = f->word_num;
+                temp->count = 1;
+                temp->last = f->word_num;
+                temp->lastp = f->current_pos;
+                temp->firstp = f->word_pos;
+                temp->next = NULL;
+                temp->dmin = -1;  //indicativo que a distância ainda não foi alterada
+                temp->dmax = -1;  //indicativo que a distância ainda não foi alterada
+                temp->dminp = -1; //indicativo que a distância ainda não foi alterada
+                temp->dmaxp = -1; //indicativo que a distância ainda não foi alterada
+                actual->next = temp;
             }
         }
     }
@@ -85,7 +98,7 @@ void add_ele(w_ele **words, file_data_t *f)
 
 void get_info(w_ele **words, char name[])
 {
-    printf("%s",name);
+    printf("%s", name);
     //get info about a word
     int index = hash_function(name, 500);
 }
@@ -143,13 +156,16 @@ int main(int argc, char *argv[])
     printf("Manda Nudes Laranjo\n");
     int s_hash = 500;
     w_ele *words[s_hash];
-    w_ele *w = malloc(sizeof(w_ele));
     for (int s = 0; s < s_hash; s++)
     {
         w_ele *elem = malloc(sizeof(w_ele));
         elem->valid = false;
-        elem->next=NULL;
+        elem->next = NULL;
         elem->count = 0;
+        elem->dmin = -1;  //indicativo que a distância ainda não foi alterada
+        elem->dmax = -1;  //indicativo que a distância ainda não foi alterada
+        elem->dminp = -1; //indicativo que a distância ainda não foi alterada
+        elem->dmaxp = -1; //indicativo que a distância ainda não foi alterada
         words[s] = elem;
     }
     file_data_t *f = malloc(sizeof(file_data_t));
@@ -168,7 +184,7 @@ int main(int argc, char *argv[])
         printf("Error opening file!\n");
         printf("------------------\n");
     }
-    get_info(words,"ok");
+    get_info(words, "ok");
     close_text_file(f);
     /*   w_ele *w = words[473];
     printf("ok\n");
