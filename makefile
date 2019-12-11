@@ -11,4 +11,4 @@ run_all:	all
 	./main
 
 main:	main.c
-	cc -Wall -O2 main.c -o main -lm 
+	cc -g -Wall -O2 main.c -o main -lm 

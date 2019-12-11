@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 // wc SherlockHolmes.txt  shell command count words by space
 
 typedef struct file_data //com typedef não preciso de estar sempre a escrever struck file_data_t NOT SURE
@@ -15,16 +16,17 @@ typedef struct file_data //com typedef não preciso de estar sempre a escrever s
 
 typedef struct w_ele
 {
-    bool valid = false; // para verificar se é nula ou não
+    bool valid; // para verificar se é nula ou não
     char word[64];
     int count;          //contador de palavras
-    int tdist;          //total da soma das distâncias
+    int tdist;          //total da soma das distâncias (em relação ao contador de palavras geral)
+    int tdistp;         //total da soma das distâncias (em relação à posição dos indices)
     int dmin;           //distância mínima (em relação ao contador de palavras geral)
     int dmax;           //distância máxima (em relação ao contador de palavras geral)
     int dminp;          //distância mínima (em relação à posição dos indices)
     int dmaxp;          //distância máxima (em relação à posição dos indices)
-    int last            //última posição (em relação ao contador de palavras geral)
-    int first           //última posição (em relação ao contador de palavras geral)
+    int last;           //última posição (em relação ao contador de palavras geral)
+    int first;          //primeira posição (em relação ao contador de palavras geral)
     int lastp;          //última posição (em relação à posição dos indices)
     int firstp;         //primeira posição (em relação à posição dos indices)
     struct w_ele *next; // Pointer para a próxima palavra
@@ -41,34 +43,49 @@ unsigned int hash_function(const char *str, unsigned int s)
 void add_ele(w_ele **words, file_data_t *f)
 {
     int index = hash_function(f->word, 500);
-    w_ele *w = malloc(sizeof(w_ele));
-    w_ele *actual word[index];
-    if (actual->valid == true) //se já existir um elemtno na linked list daquele index
+    w_ele *actual = words[index];
+    if (actual->valid == true) //se já existir um elemento na linked list daquele index
     {
-        if (strcmp(actual->word, f->word))
-        { //se não for igual
-            actual->next = w;
-            strcpy(w->word, f->word);
-            w->valid = true;
-            w->count++;
+        if (strcmp(actual->word, f->word) == 0)
+        { // se for igual
+
+            actual->count++;
         }
         else
-        { // se for igual
-            actual->count++;
+        { //se não for igual
+            bool found = false;
+           while (actual->next != NULL)
+            {
+                actual = actual->next;
+                if (strcmp(actual->word, f->word) == 0)
+                { // se for igual
+
+                    actual->count++;
+                    found=true;
+                    break;
+                }
+                
+            }
+            if(!found){
+
+            }
         }
     }
     else
     {
-        strcpy(w->word, f->word);
-        w->valid = true;
-        w->count++;
-        words[index] = w;
+        strcpy(actual->word, f->word);
+        actual->valid = true;
+        actual->first = f->word_num;
+        actual->count++;
+        actual->last = f->word_num;
+        actual->lastp = f->current_pos;
+        actual->firstp = f->word_pos;
     }
 }
 
-void get_info(w_ele **words, char *name[])
+void get_info(w_ele **words, char name[])
 {
-
+    printf("%s",name);
     //get info about a word
     int index = hash_function(name, 500);
 }
@@ -124,7 +141,17 @@ int read_word(file_data_t *fd)
 int main(int argc, char *argv[])
 {
     printf("Manda Nudes Laranjo\n");
-    w_ele *words[500];
+    int s_hash = 500;
+    w_ele *words[s_hash];
+    w_ele *w = malloc(sizeof(w_ele));
+    for (int s = 0; s < s_hash; s++)
+    {
+        w_ele *elem = malloc(sizeof(w_ele));
+        elem->valid = false;
+        elem->next=NULL;
+        elem->count = 0;
+        words[s] = elem;
+    }
     file_data_t *f = malloc(sizeof(file_data_t));
     if (!open_text_file("test.txt", f))
     {
@@ -133,10 +160,19 @@ int main(int argc, char *argv[])
         {
             add_ele(words, f);
         }
+        printf("File read successfully!\n");
     }
-    w_ele *w = words[473];
+    else
+    {
+        printf("------------------\n");
+        printf("Error opening file!\n");
+        printf("------------------\n");
+    }
+    get_info(words,"ok");
+    close_text_file(f);
+    /*   w_ele *w = words[473];
     printf("ok\n");
-    printf("%s", w->word);
+    printf("%s", w->word);*/
     //printf("Contador de palavras: %ld     Indice do inicio da palavra atual(em todo o texto): %ld    Indice do final da palavra atual(em todo o texto): %ld\n", f->word_num, f->word_pos, f->current_pos);
     //Falta método para verificar se o elemento da linkedlist está vazio!
 }
