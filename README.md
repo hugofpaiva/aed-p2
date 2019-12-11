@@ -11,7 +11,7 @@ To compile programs, it is necessary to have a C compiler installed on your loca
 The following command **compiles main program** (*main.c*) where <executable_filename>  will be the executable filename: 
 
 ```
-
+cc -Wall -O2 main.c -o <executable_filename> -lm
 ```
 
 ## Running
