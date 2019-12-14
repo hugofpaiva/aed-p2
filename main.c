@@ -61,11 +61,12 @@ void add_node(tree_node *actual, file_data_t *f)
 {
     bool found = false;
     tree_node *parent = NULL;
-
-    while (actual->valid == true)
+    int i=0;
+    
+    while (actual != NULL)
     {
         if (strcmp(actual->word, f->word) == 0) //se este for o correspondente à palavra lida
-        {
+        {printf("null: %s     Number:%d\n",actual->word,i);
             long tempdist = f->word_num - actual->last;
             long tempdistp = f->current_pos - actual->lastp;
             actual->tdist = actual->tdist + tempdist;
@@ -91,6 +92,7 @@ void add_node(tree_node *actual, file_data_t *f)
         }
     }
     //Se não existir aquela palavra
+    printf("Not null: %s     Number:%d\n",actual->word,i);
     if (!found)
     {
         if(actual->parent!=NULL){
@@ -351,6 +353,7 @@ int main(int argc, char *argv[])
                 add_node(root, f);
             }
             printf("File read successfully!\n");
+            printf("%s", root->word);
         }
         else
         {
