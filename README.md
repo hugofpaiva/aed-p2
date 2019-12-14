@@ -20,7 +20,7 @@ cc -Wall -O2 main.c -o <executable_filename> -lm
 **Options:**
 ```
 -h				    Initialize program using HashTable
--t 					Initialize program using Ordered Binary Tree
+-t 			            Initialize program using Ordered Binary Tree
 ```
 ## Details
 All the details, including the results, can be found in the [Work Report](/relatorio/AED_Report.pdf).
