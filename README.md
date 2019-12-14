@@ -18,7 +18,7 @@ cc -Wall -O2 main.c -o <executable_filename> -lm
 
 **Options:**
 ```
--h				  		Initialize program using HashTable
+-h				  Initialize program using HashTable
 -t 					  Initialize program using Ordered Binary Tree
 ```
 ## Details
