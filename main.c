@@ -272,7 +272,7 @@ int read_word(file_data_t *fd)
     fd->word_num++;
     fd->word[0] = (char)c;
     for (i = 1; i < (int)sizeof(fd->word) - 1; i++)
-    {
+    {//ignorar os carateres especiais/////////////////////////////////////////////////////
         c = fgetc(fd->fp);
         if (c == EOF)
             break; // end of file
@@ -301,6 +301,9 @@ int main(int argc, char *argv[])
         printf("Initializing HashTable\n");
         int s_hash = 500;
         link_ele *words[s_hash];
+        /*
+        link_ele **words = (link_ele *)calloc(s_hash,sizeof(link_ele *)); cria e anuncia-os como zero(NULL)
+        */
         for (int s = 0; s < s_hash; s++)
         {
             link_ele *elem = malloc(sizeof(link_ele));
@@ -314,7 +317,7 @@ int main(int argc, char *argv[])
             words[s] = elem;
         }
         file_data_t *f = malloc(sizeof(file_data_t));
-        if (!open_text_file("test.txt", f))
+        if (!open_text_file("SherlockHolmes.txt", f))
         {
             while (!read_word(f))
             {
