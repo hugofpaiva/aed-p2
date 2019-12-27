@@ -7,6 +7,7 @@
 
 #define minus_inf -1000000000 // a very small integer
 #define plus_inf +1000000000  // a very large integer
+int count_array; //Variável para ver quantos espaços do array estamos a usar
 // wc SherlockHolmes.txt  shell command count words by space
 
 typedef struct file_data //com typedef não preciso de estar sempre a escrever struck file_data_t NOT SURE
@@ -55,6 +56,14 @@ typedef struct tree_node
     long firstp; //primeira posição (em relação à posição dos indices)
     long data;   // the data item (we use an int here, but it can be anything)
 } tree_node;
+
+unsigned int hash_function(const char *str, unsigned int s)
+{ // for 32-bit unsigned integers, s should be smaller that 16777216u
+    unsigned int h;
+    for (h = 0u; *str != '\0'; str++)
+        h = (256u * h + (0xFFu & (unsigned int)*str)) % s;
+    return h;
+}
 
 void add_node(tree_node **words, file_data_t *f, int size)
 {
@@ -137,6 +146,8 @@ void add_node(tree_node **words, file_data_t *f, int size)
     }
     else
     { //definir a root
+        count_array++;
+        tree_node *actual = malloc(sizeof(tree_node));
         strcpy(actual->word, f->word);
         actual->right = NULL;
         actual->left = NULL;
@@ -152,14 +163,6 @@ void add_node(tree_node **words, file_data_t *f, int size)
         actual->lastp = f->current_pos;
         actual->firstp = f->word_pos;
     }
-}
-
-unsigned int hash_function(const char *str, unsigned int s)
-{ // for 32-bit unsigned integers, s should be smaller that 16777216u
-    unsigned int h;
-    for (h = 0u; *str != '\0'; str++)
-        h = (256u * h + (0xFFu & (unsigned int)*str)) % s;
-    return h;
 }
 
 void add_ele(link_ele **words, file_data_t *f, int size)
@@ -233,6 +236,8 @@ void add_ele(link_ele **words, file_data_t *f, int size)
     }
     else
     {
+        count_array++;
+        link_ele *actual = malloc(sizeof(link_ele));
         strcpy(actual->word, f->word);
         actual->next = NULL;
         actual->count = 0;
@@ -289,29 +294,32 @@ void get_info_link(link_ele **words, int size)
     int index = hash_function(name, size);
     link_ele *actual = words[index];
     bool found = false;
-    while (actual->next != NULL)
-    {
-        actual = actual->next;
-        if (strcmp(actual->word, name) == 0) //Double check, pode vir a ser retirado
+    if(actual!=NULL)
+     {
+        while (actual->next != NULL)
         {
-            printf("\nInformation about word '%s'\n", name);
-            printf("\nCount: %ld\n", actual->count);
-            printf("\nPosition (related to the index position of all the text):\n");
-            printf("First: %ld\n", actual->first);
-            printf("Last: %ld\n", actual->last);
-            printf("\nPosition (related to the distinct word counter):\n");
-            printf("First: %ld\n", actual->firstp);
-            printf("Last: %ld\n", actual->lastp);
-            printf("\nDistances beetween consecutive occurrences (related to the index position):\n");
-            printf("Smallest: %ld\n", actual->dminp);
-            printf("Average: %ld\n", (actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
-            printf("Largest: %ld\n", actual->dmaxp);
-            printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
-            printf("Smallest: %ld\n", actual->dmin);
-            printf("Average: %ld\n", (actual->tdist) / (actual->count - 1));
-            printf("Largest: %ld\n\n", actual->dmax);
-            found = true;
-            break;
+            actual = actual->next;
+            if (strcmp(actual->word, name) == 0) //Double check, pode vir a ser retirado
+            {
+                printf("\nInformation about word '%s'\n", name);
+                printf("\nCount: %ld\n", actual->count);
+                printf("\nPosition (related to the index position of all the text):\n");
+                printf("First: %ld\n", actual->first);
+                printf("Last: %ld\n", actual->last);
+                printf("\nPosition (related to the distinct word counter):\n");
+                printf("First: %ld\n", actual->firstp);
+                printf("Last: %ld\n", actual->lastp);
+                printf("\nDistances beetween consecutive occurrences (related to the index position):\n");
+                printf("Smallest: %ld\n", actual->dminp);
+                printf("Average: %ld\n", (actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                printf("Largest: %ld\n", actual->dmaxp);
+                printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                printf("Smallest: %ld\n", actual->dmin);
+                printf("Average: %ld\n", (actual->tdist) / (actual->count - 1));
+                printf("Largest: %ld\n\n", actual->dmax);
+                found = true;
+                break;
+            }
         }
     }
 
@@ -394,7 +402,7 @@ int read_word(file_data_t *fd)
     do
     {
         c = fgetc(fd->fp);
-        if (c == EOF || !isalnum(c)) //ignorar os carateres que não são alphanumeric
+        if (c == EOF) 
             return -1;
         fd->current_pos++;
     } while (c <= 32);
@@ -405,8 +413,6 @@ int read_word(file_data_t *fd)
     for (i = 1; i < (int)sizeof(fd->word) - 1; i++)
     {
         c = fgetc(fd->fp);
-        if(!isalnum(c))//ignorar os carateres que não são alphanumeric
-            continue;
         if (c == EOF)
             break; // end of file
         fd->current_pos++;
@@ -429,9 +435,9 @@ void usage(char *argv[])
 
 int main(int argc, char *argv[])
 {
-    int count = 0;
     if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h')
     {
+        count_array=0;
         printf("Initializing HashTable\n");
         int s_hash = 500;
         link_ele **words = (link_ele *)calloc(s_hash, sizeof(link_ele *)); //cria e anuncia-os como zero(NULL)
@@ -440,12 +446,17 @@ int main(int argc, char *argv[])
         {
             while (!read_word(f))
             {
-                if (count / s_hash >= 0.8)
+                if ((count_array / s_hash) >= 0.8)
                 {
+                    printf("%d\n",count_array);
+                    printf("%d\n",s_hash);
+                    printf("resize\n");
                     words = resize_link(words, &s_hash);
+                    count_array=0;
+                     printf("%d\n",s_hash);
                 }
                 add_ele(words, f, s_hash);
-                count++;
+                
             }
             printf("File read successfully!\n");
         }
@@ -460,6 +471,7 @@ int main(int argc, char *argv[])
     }
     else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
     {
+        count_array=0;
         printf("Initializing Ordered Binary Tree\n");
         int s_hash = 500;
         tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
@@ -468,12 +480,12 @@ int main(int argc, char *argv[])
         {
             while (!read_word(f))
             {
-                if (count / s_hash >= 0.8)
+                if (count_array / s_hash >= 0.8)
                 {
                     words = resize_node(words, &s_hash);
+                    count_array=0;
                 }
                 add_node(words, f, s_hash);
-                count++;
             }
             printf("File read successfully!\n");
         }
