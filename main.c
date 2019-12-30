@@ -286,7 +286,7 @@ tree_node **resize_node(tree_node **words, int *size)
     *size = 2 * (*size);
     return words_temp;
 }
-
+/*
 void get_info_link(link_ele **words, int size)
 {
     char name[64];
@@ -311,14 +311,21 @@ void get_info_link(link_ele **words, int size)
                 printf("\nPosition (related to the distinct word counter):\n");
                 printf("First: %ld\n", actual->firstp);
                 printf("Last: %ld\n", actual->lastp);
-                printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
-                printf("Smallest: %ld\n", actual->dminp);
-                printf("Average: %2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
-                printf("Largest: %ld\n", actual->dmaxp);
-                printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
-                printf("Smallest: %ld\n", actual->dmin);
-                printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
-                printf("Largest: %ld\n\n", actual->dmax);
+                if (actual->count > 1)
+                {
+                    printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                    printf("Smallest: %ld\n", actual->dminp);
+                    printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                    printf("Largest: %ld\n", actual->dmaxp);
+                    printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                    printf("Smallest: %ld\n", actual->dmin);
+                    printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                    printf("Largest: %ld\n\n", actual->dmax);
+                }
+                else
+                {
+                    printf("\n No distances stats available.\n\n");
+                }
                 found = true;
                 break;
             }
@@ -332,7 +339,7 @@ void get_info_link(link_ele **words, int size)
         exit(0);
     }
 }
-
+*/
 void get_info_node(tree_node **words, int size)
 {
     char name[64];
@@ -363,14 +370,21 @@ void get_info_node(tree_node **words, int size)
                 printf("\nPosition (related to the distinct word counter):\n");
                 printf("First: %ld\n", actual->firstp);
                 printf("Last: %ld\n", actual->lastp);
-                printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
-                printf("Smallest: %ld\n", actual->dminp);
-                printf("Average: %2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
-                printf("Largest: %ld\n", actual->dmaxp);
-                printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
-                printf("Smallest: %ld\n", actual->dmin);
-                printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
-                printf("Largest: %ld\n\n", actual->dmax);
+                if (actual->count > 1)
+                {
+                    printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                    printf("Smallest: %ld\n", actual->dminp);
+                    printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                    printf("Largest: %ld\n", actual->dmaxp);
+                    printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                    printf("Smallest: %ld\n", actual->dmin);
+                    printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                    printf("Largest: %ld\n\n", actual->dmax);
+                }
+                else
+                {
+                    printf("\n No distances stats available.\n\n");
+                }
                 found = true;
                 break;
             }
@@ -383,42 +397,90 @@ void get_info_node(tree_node **words, int size)
     }
 }
 
-void get_info_link_strn(link_ele **words, int size)
+void get_info_link(link_ele **words, int size)
 {
     char name[64];
-    printf("Insert word (or start of the word) for info: (Empty for all)");
-    scanf("%[^\n]", name);
-    fflush(stdin);
-    bool found = false;
-
-    for (int i = 0; i < size; i++)
+    printf("Insert word, or start of it, for info (empty for all): ");
+    if (gets(name) != NULL)
     {
-        printf("INDICE %d\n", i);
-        link_ele *actual = words[i];
-        if (actual != NULL)
-        {         
-            while (actual->next != NULL)
+        int s_name = strlen(name);
+        for (int i = 0; i < size; i++)
+        {
+            link_ele *actual = words[i];
+            if (actual != NULL)
             {
-                printf("\nInformation about word '%s'\n", actual->word);
-                printf("\nCount: %ld\n", actual->count);
-                printf("\nPosition (related to the index position of all the text):\n");
-                printf("First: %ld\n", actual->first);
-                printf("Last: %ld\n", actual->last);
-                printf("\nPosition (related to the distinct word counter):\n");
-                printf("First: %ld\n", actual->firstp);
-                printf("Last: %ld\n", actual->lastp);
-                printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
-                printf("Smallest: %ld\n", actual->dminp);
-                printf("Average: %2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
-                printf("Largest: %ld\n", actual->dmaxp);
-                printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
-                printf("Smallest: %ld\n", actual->dmin);
-                printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
-                printf("Largest: %ld\n\n", actual->dmax);
-                actual = actual->next;
+                while (actual->next != NULL)
+                {
+                    if (strncmp(name, actual->word, s_name) == 0)
+                    {
+                        printf("\nInformation about word '%s'\n", actual->word);
+                        printf("\nCount: %ld\n", actual->count);
+                        printf("\nPosition (related to the index position of all the text):\n");
+                        printf("First: %ld\n", actual->first);
+                        printf("Last: %ld\n", actual->last);
+                        printf("\nPosition (related to the distinct word counter):\n");
+                        printf("First: %ld\n", actual->firstp);
+                        printf("Last: %ld\n", actual->lastp);
+                        if (actual->count > 1)
+                        {
+                            printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                            printf("Smallest: %ld\n", actual->dminp);
+                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                            printf("Largest: %ld\n", actual->dmaxp);
+                            printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                            printf("Smallest: %ld\n", actual->dmin);
+                            printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                            printf("Largest: %ld\n\n", actual->dmax);
+                        }
+                        else
+                        {
+                            printf("\nNo distances stats available.\n\n");
+                        }
+                    }
+                    actual = actual->next;
+                }
             }
         }
     }
+    else
+    {
+        for (int i = 0; i < size; i++)
+        {
+            link_ele *actual = words[i];
+            if (actual != NULL)
+            {
+                while (actual->next != NULL)
+                {
+                    printf("\nInformation about word '%s'\n", actual->word);
+                    printf("\nCount: %ld\n", actual->count);
+                    printf("\nPosition (related to the index position of all the text):\n");
+                    printf("First: %ld\n", actual->first);
+                    printf("Last: %ld\n", actual->last);
+                    printf("\nPosition (related to the distinct word counter):\n");
+                    printf("First: %ld\n", actual->firstp);
+                    printf("Last: %ld\n", actual->lastp);
+                    if (actual->count > 1)
+                    {
+                        printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                        printf("Smallest: %ld\n", actual->dminp);
+                        printf("Average: %2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                        printf("Largest: %ld\n", actual->dmaxp);
+                        printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                        printf("Smallest: %ld\n", actual->dmin);
+                        printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
+                        printf("Largest: %ld\n\n", actual->dmax);
+                    }
+                    else
+                    {
+                        printf("\nNo distances stats available.\n\n");
+                    }
+
+                    actual = actual->next;
+                }
+            }
+        }
+    }
+    fflush(stdin);
 }
 
 int open_text_file(char *file_name, file_data_t *fd)
@@ -511,7 +573,7 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             exit(0);
         }
-        get_info_link_strn(words, s_hash);
+        get_info_link(words, s_hash);
         close_text_file(f);
     }
     else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
