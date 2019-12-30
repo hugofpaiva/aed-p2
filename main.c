@@ -493,6 +493,8 @@ int main(int argc, char *argv[])
             printf("Error opening file!\n");
             printf("------------------\n");
         }
+        get_info_node(words, s_hash);
+        close_text_file(f);
     }
     else
     {
