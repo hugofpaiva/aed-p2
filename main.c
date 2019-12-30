@@ -310,7 +310,7 @@ void get_info_link(link_ele **words, int size)
                 printf("\nPosition (related to the distinct word counter):\n");
                 printf("First: %ld\n", actual->firstp);
                 printf("Last: %ld\n", actual->lastp);
-                printf("\nDistances beetween consecutive occurrences (related to the index position):\n");
+                printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
                 printf("Smallest: %ld\n", actual->dminp);
                 printf("Average: %ld\n", (actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
                 printf("Largest: %ld\n", actual->dmaxp);
@@ -361,7 +361,7 @@ void get_info_node(tree_node **words, int size)
             printf("\nPosition (related to the distinct word counter):\n");
             printf("First: %ld\n", actual->firstp);
             printf("Last: %ld\n", actual->lastp);
-            printf("\nDistances beetween consecutive occurrences (related to the index position):\n");
+            printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
             printf("Smallest: %ld\n", actual->dminp);
             printf("Average: %ld\n", (actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
             printf("Largest: %ld\n", actual->dmaxp);
