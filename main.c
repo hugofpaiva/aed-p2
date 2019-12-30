@@ -341,6 +341,8 @@ void get_info_node(tree_node **words, int size)
     int index = hash_function(name, size);
     tree_node *actual = words[index];
     bool found = false;
+    if(actual!=NULL)
+     {
     while (actual->left != NULL || actual->right != NULL)
     {
         if (strcmp(name, actual->word) < 0) //palavra atual é mais pequena que a deste node
@@ -371,6 +373,7 @@ void get_info_node(tree_node **words, int size)
             break;
         }
     }
+     } 
     if (!found)
     {
         printf("Word %s not found!\n", name);
@@ -463,6 +466,7 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             printf("Error opening file!\n");
             printf("------------------\n");
+            exit(0);
         }
         get_info_link(words, s_hash);
         close_text_file(f);
@@ -474,7 +478,7 @@ int main(int argc, char *argv[])
         int s_hash = 500;
         tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
         file_data_t *f = malloc(sizeof(file_data_t));
-        if (!open_text_file("test.txt", f))
+        if (!open_text_file("SherlockHolmes.txt", f))
         {
             while (!read_word(f))
             {
@@ -492,6 +496,7 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             printf("Error opening file!\n");
             printf("------------------\n");
+            exit(0);
         }
         get_info_node(words, s_hash);
         close_text_file(f);
