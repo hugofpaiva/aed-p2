@@ -92,12 +92,12 @@ void add_node(tree_node **words, file_data_t *f, int size)
         else
         { //se não for igual vou percorrer os next elements para ver se há algum igual
             bool found = false;
-            while (actual!=NULL) // Enquanto a palavra não for encontra e as duas ligações abaixo não forem nulas
+            while (actual != NULL) // Enquanto a palavra não for encontra e as duas ligações abaixo não forem nulas
             {
-                if (strcmp(f->word, actual->word) < 0) //palavra atual é mais pequena que a deste node
+                if (strcmp(f->word, actual->word) < 0 && actual->left != NULL) //palavra atual é mais pequena que a deste node
                     actual = actual->left;
 
-                else if (strcmp(f->word, actual->word) < 0) //palavra atual é mais pequena que a deste node
+                else if (strcmp(f->word, actual->word) < 0 && actual->right != NULL) //palavra atual é mais pequena que a deste node
                     actual = actual->right;
 
                 else
@@ -146,7 +146,6 @@ void add_node(tree_node **words, file_data_t *f, int size)
     }
     else
     { //definir a root
-        count_array++;
         tree_node *new = malloc(sizeof(tree_node));
         strcpy(new->word, f->word);
         new->parent = NULL;
@@ -271,21 +270,6 @@ link_ele **resize_link(link_ele **words, int *size)
     return words_temp;
 }
 
-tree_node **resize_node(tree_node **words, int *size)
-{
-    int newsize = 2 * (*size);
-    tree_node **words_temp = (tree_node *)calloc(newsize, sizeof(tree_node *));
-    for (int i = 0; i < (*size); i++)
-    {
-        if (words[i] != NULL)
-        {
-            int index = hash_function(words[i]->word, newsize);
-            words_temp[index] = words[i];
-        }
-    }
-    *size = 2 * (*size);
-    return words_temp;
-}
 /*
 void get_info_link(link_ele **words, int size)
 {
@@ -408,63 +392,63 @@ void get_info_node(tree_node **words, int size)
         for (int i = 0; i < size; i++)
         {
             tree_node *actual = words[i];
-            if (actual != NULL)
+
+            while (actual != NULL)
             {
-                while (actual->left != NULL && actual->right != NULL)
-                {
-                    printf("%s\n", actual->word);
-                    if (strncmp(name, actual->word, s_name) < 0 && actual->left != NULL)
-                    { //palavra atual é mais pequena que a deste node
-                        actual = actual->left;
-                        printf("left\n");
-                    }
+                printf("%s\n", actual->word);
+                if (strncmp(name, actual->word, s_name) < 0 && actual->left != NULL)
+                { //palavra atual é mais pequena que a deste node
+                    actual = actual->left;
+                    printf("left\n");
+                }
 
-                    else if (strncmp(name, actual->word, s_name) > 0 && actual->right != NULL)
-                    { //palavra atual é maior que a deste node
-                        actual = actual->right;
-                        printf("right\n");
-                    }
+                else if (strncmp(name, actual->word, s_name) > 0 && actual->right != NULL)
+                { //palavra atual é maior que a deste node
+                    actual = actual->right;
+                    printf("right\n");
+                }
 
-                    else if (strncmp(name, actual->word, s_name) == 0)
-                    { // se for igual
-                        printf("\nInformation about word '%s'\n", actual->word);
-                        printf("\nCount: %ld\n", actual->count);
-                        printf("\nPosition (related to the index position of all the text):\n");
-                        printf("First: %ld\n", actual->first);
-                        printf("Last: %ld\n", actual->last);
-                        printf("\nPosition (related to the distinct word counter):\n");
-                        printf("First: %ld\n", actual->firstp);
-                        printf("Last: %ld\n", actual->lastp);
-                        if (actual->count > 1)
-                        {
-                            printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
-                            printf("Smallest: %ld\n", actual->dminp);
-                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
-                            printf("Largest: %ld\n", actual->dmaxp);
-                            printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
-                            printf("Smallest: %ld\n", actual->dmin);
-                            printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
-                            printf("Largest: %ld\n\n", actual->dmax);
-                        }
-                        else
-                        {
-                            printf("\n No distances stats available.\n\n");
-                        }
-                        found = true;
+                else if (strncmp(name, actual->word, s_name) == 0)
+                { // se for igual
+                    printf("\nInformation about word '%s'\n", actual->word);
+                    printf("\nCount: %ld\n", actual->count);
+                    printf("\nPosition (related to the index position of all the text):\n");
+                    printf("First: %ld\n", actual->first);
+                    printf("Last: %ld\n", actual->last);
+                    printf("\nPosition (related to the distinct word counter):\n");
+                    printf("First: %ld\n", actual->firstp);
+                    printf("Last: %ld\n", actual->lastp);
+                    if (actual->count > 1)
+                    {
+                        printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                        printf("Smallest: %ld\n", actual->dminp);
+                        printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias consecutivas e não de palavras
+                        printf("Largest: %ld\n", actual->dmaxp);
+                        printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                        printf("Smallest: %ld\n", actual->dmin);
+                        printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                        printf("Largest: %ld\n\n", actual->dmax);
                     }
+                    else
+                    {
+                        printf("\n No distances stats available.\n\n");
+                    }
+                    found = true;
+                    break;
                 }
             }
         }
     }
     else
     {
+        int s_name = strlen(name);
         for (int i = 0; i < size; i++)
         {
             tree_node *actual = words[i];
             if (actual != NULL)
             {
                 found = true;
-                while (actual->left != NULL && actual->right != NULL)
+                while (actual!=NULL)
                 {
                     printf("%s\n", actual->word);
                     if (strncmp(name, actual->word, s_name) < 0 && actual->left != NULL)
@@ -493,7 +477,7 @@ void get_info_node(tree_node **words, int size)
                         {
                             printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
                             printf("Smallest: %ld\n", actual->dminp);
-                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias consecutivas e não de palavras
                             printf("Largest: %ld\n", actual->dmaxp);
                             printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
                             printf("Smallest: %ld\n", actual->dmin);
@@ -546,7 +530,7 @@ void get_info_link(link_ele **words, int size)
                         {
                             printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
                             printf("Smallest: %ld\n", actual->dminp);
-                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias consecutivas e não de palavras
                             printf("Largest: %ld\n", actual->dmaxp);
                             printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
                             printf("Smallest: %ld\n", actual->dmin);
@@ -705,7 +689,6 @@ int main(int argc, char *argv[])
     }
     else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
     {
-        count_array = 0;
         printf("Initializing Ordered Binary Tree\n");
         int s_hash = 500;
         tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
@@ -718,11 +701,6 @@ int main(int argc, char *argv[])
         {
             while (!read_word(f))
             {
-                if ((double)count_array / s_hash >= 0.8)
-                {
-                    words = resize_node(words, &s_hash);
-                    count_array = 0;
-                }
                 add_node(words, f, s_hash);
             }
             printf("File read successfully!\n");
