@@ -149,7 +149,9 @@ void add_node(tree_node **words, file_data_t *f, int size)
         count_array++;
         tree_node *new = malloc(sizeof(tree_node));
         strcpy(new->word, f->word);
-        new->next = NULL;
+        new->parent = NULL;
+        new->left = NULL;
+        new->right = NULL;
         new->count = 0;
         new->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
         new->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
@@ -168,8 +170,12 @@ void add_ele(link_ele **words, file_data_t *f, int size)
 {
     int index = hash_function(f->word, size);
     link_ele *actual = words[index];
+    if(index == 100)
+        printf("Sou o 100 caralho\n");
     if (actual != NULL) //se já existir um elemento na linked list daquele index
     {   
+        if(index == 100)
+        printf("O 100 entrou\n");
         if (strcmp(actual->word, f->word) == 0)
         { // se for igual
             long tempdist = f->word_num - actual->last;
