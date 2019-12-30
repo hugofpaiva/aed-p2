@@ -147,20 +147,20 @@ void add_node(tree_node **words, file_data_t *f, int size)
     else
     { //definir a root
         count_array++;
-        tree_node *actual = malloc(sizeof(tree_node));
-        strcpy(actual->word, f->word);
-        actual->right = NULL;
-        actual->left = NULL;
-        actual->parent = NULL;
-        actual->count = 1;
-        actual->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
-        actual->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
-        actual->dminp = plus_inf;  //indicativo que a distância ainda não foi alterada
-        actual->dmaxp = minus_inf; //indicativo que a distância ainda não foi alterada
-        actual->first = f->word_num;
-        actual->last = f->word_num;
-        actual->lastp = f->current_pos;
-        actual->firstp = f->word_pos;
+        tree_node *new = malloc(sizeof(tree_node));
+        strcpy(new->word, f->word);
+        new->next = NULL;
+        new->count = 0;
+        new->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
+        new->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
+        new->dminp = plus_inf;  //indicativo que a distância ainda não foi alterada
+        new->dmaxp = minus_inf; //indicativo que a distância ainda não foi alterada
+        new->first = f->word_num;
+        new->count++;
+        new->last = f->word_num;
+        new->lastp = f->current_pos;
+        new->firstp = f->word_pos;
+        words[index]=new;
     }
 }
 
@@ -169,7 +169,7 @@ void add_ele(link_ele **words, file_data_t *f, int size)
     int index = hash_function(f->word, size);
     link_ele *actual = words[index];
     if (actual != NULL) //se já existir um elemento na linked list daquele index
-    {
+    {   
         if (strcmp(actual->word, f->word) == 0)
         { // se for igual
             long tempdist = f->word_num - actual->last;
@@ -236,19 +236,20 @@ void add_ele(link_ele **words, file_data_t *f, int size)
     else
     {
         count_array++;
-        link_ele *actual = malloc(sizeof(link_ele));
-        strcpy(actual->word, f->word);
-        actual->next = NULL;
-        actual->count = 0;
-        actual->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
-        actual->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
-        actual->dminp = plus_inf;  //indicativo que a distância ainda não foi alterada
-        actual->dmaxp = minus_inf; //indicativo que a distância ainda não foi alterada
-        actual->first = f->word_num;
-        actual->count++;
-        actual->last = f->word_num;
-        actual->lastp = f->current_pos;
-        actual->firstp = f->word_pos;
+        link_ele *new = malloc(sizeof(link_ele));
+        strcpy(new->word, f->word);
+        new->next = NULL;
+        new->count = 0;
+        new->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
+        new->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
+        new->dminp = plus_inf;  //indicativo que a distância ainda não foi alterada
+        new->dmaxp = minus_inf; //indicativo que a distância ainda não foi alterada
+        new->first = f->word_num;
+        new->count++;
+        new->last = f->word_num;
+        new->lastp = f->current_pos;
+        new->firstp = f->word_pos;
+        words[index]=new;
     }
 }
 
@@ -447,12 +448,8 @@ int main(int argc, char *argv[])
             {
                 if ((double) count_array / s_hash >= 0.8)
                 {
-                    printf("%d\n",count_array);
-                    printf("%d\n",s_hash);
-                    printf("resize\n");
                     words = resize_link(words, &s_hash);
                     count_array=0;
-                    printf("%d\n",s_hash);
                 }
                 add_ele(words, f, s_hash);
                 
@@ -479,7 +476,7 @@ int main(int argc, char *argv[])
         {
             while (!read_word(f))
             {
-                if (count_array / s_hash >= 0.8)
+                if ((double) count_array / s_hash >= 0.8)
                 {
                     words = resize_node(words, &s_hash);
                     count_array=0;
