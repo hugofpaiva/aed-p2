@@ -170,12 +170,8 @@ void add_ele(link_ele **words, file_data_t *f, int size)
 {
     int index = hash_function(f->word, size);
     link_ele *actual = words[index];
-    if(index == 100)
-        printf("Sou o 100 caralho\n");
     if (actual != NULL) //se já existir um elemento na linked list daquele index
     {   
-        if(index == 100)
-        printf("O 100 entrou\n");
         if (strcmp(actual->word, f->word) == 0)
         { // se for igual
             long tempdist = f->word_num - actual->last;
@@ -303,8 +299,7 @@ void get_info_link(link_ele **words, int size)
     if(actual!=NULL)
      {
         while (actual->next != NULL)
-        {
-            actual = actual->next;
+        {   
             if (strcmp(actual->word, name) == 0) //Double check, pode vir a ser retirado
             {
                 printf("\nInformation about word '%s'\n", name);
@@ -326,6 +321,7 @@ void get_info_link(link_ele **words, int size)
                 found = true;
                 break;
             }
+            actual = actual->next;
         }
     }
 
