@@ -152,13 +152,12 @@ void add_node(tree_node **words, file_data_t *f, int size)
         actual->right = NULL;
         actual->left = NULL;
         actual->parent = NULL;
-        actual->count = 0;
+        actual->count = 1;
         actual->dmin = plus_inf;   //indicativo que a distância ainda não foi alterada
         actual->dmax = minus_inf;  //indicativo que a distância ainda não foi alterada
         actual->dminp = plus_inf;  //indicativo que a distância ainda não foi alterada
         actual->dmaxp = minus_inf; //indicativo que a distância ainda não foi alterada
         actual->first = f->word_num;
-        actual->count++;
         actual->last = f->word_num;
         actual->lastp = f->current_pos;
         actual->firstp = f->word_pos;
@@ -446,14 +445,14 @@ int main(int argc, char *argv[])
         {
             while (!read_word(f))
             {
-                if ((count_array / s_hash) >= 0.8)
+                if ((double) count_array / s_hash >= 0.8)
                 {
                     printf("%d\n",count_array);
                     printf("%d\n",s_hash);
                     printf("resize\n");
                     words = resize_link(words, &s_hash);
                     count_array=0;
-                     printf("%d\n",s_hash);
+                    printf("%d\n",s_hash);
                 }
                 add_ele(words, f, s_hash);
                 
