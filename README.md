@@ -26,7 +26,7 @@ cc -Wall -O2 main.c -o <executable_filename> -lm
 -t ........................ Initialize program and runs some tests
 ```
 ## Details
-All the details, including the results, can be found in the [Work Report](/relatorio/AED_Report.pdf).
+All the details, including the results, can be found in the [Work Report](/relatorio/AED_Report_2.pdf).
 
 ## Authors
 
