@@ -70,6 +70,7 @@ void add_node(tree_node **words, file_data_t *f, int size)
     tree_node *actual = words[index];
     if (actual != NULL) //se já existir um elemento na ordered binary tree
     {
+
         if (strcmp(actual->word, f->word) == 0)
         { // se for igual
             long tempdist = f->word_num - actual->last;
@@ -344,7 +345,7 @@ void get_info_node(tree_node **words, int size)
             else if (strcmp(name, actual->word) > 0 && actual->right != NULL) //palavra atual é maior que a deste node
                 actual = actual->right;
 
-            else if (strcmp(name, actual->word) == 0)
+            else
             { // se for igual
                 printf("\nInformation about word '%s'\n", actual->word);
                 printf("\nCount: %ld\n", actual->count);
@@ -372,8 +373,7 @@ void get_info_node(tree_node **words, int size)
                 found = true;
                 break;
             }
-            else
-                break;
+
         }
     }
     if (!found)
@@ -712,6 +712,45 @@ int main(int argc, char *argv[])
         printf("\nOption: ");
         scanf("%[^\n]", option);
         fflush(stdin);
+        if (strcmp(option, "1") == 0)
+            get_info_node(words, s_hash);
+        else if (strcmp(option, "2") == 0)
+            get_info_node_all(words, s_hash);
+        else
+        {
+            printf("Invalid option");
+            exit(0);
+        }
+    }
+    else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
+    {
+        printf("Initializing HashTable with Ordered Binary Tree\n");
+        int s_hash = 500;
+        int count_word=0;
+        tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
+        file_data_t *f = malloc(sizeof(file_data_t));
+        char file[64];
+        printf("Insert filename for stats (e.g.'SherlockHolmes.txt'): ");
+        scanf("%[^\n]", file);
+        fflush(stdin);
+        if (!open_text_file(file, f))
+        {
+            while (!read_word(f))
+            {
+                count_word=0;
+                add_node(words, f, s_hash);
+            }
+            printf("File read successfully!\n");
+            close_text_file(f);
+        }
+        else
+        {
+            printf("------------------\n");
+            printf("Error opening file!\n");
+            printf("------------------\n");
+            exit(0);
+        }
+        printf("\n Counting All Words \n");
         if (strcmp(option, "1") == 0)
             get_info_node(words, s_hash);
         else if (strcmp(option, "2") == 0)
