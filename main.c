@@ -757,14 +757,14 @@ int main(int argc, char *argv[])
         printf("\nPrinting all words stored...\n");
         usleep(5000000);
         count_stored = get_info_node_all(words, s_hash);
-        printf("\n Counting all words \n");
+        printf("\n ------------------------------------------------------------------ \n");
         printf("\n Words read - %ld\n", f->word_num);
         printf(" Words stored - %d\n", count_stored);
 
         free(words);
         free(f);
         //--------------------------------------------------------------//
-        printf("------------------------------------------------------------------");
+        printf("\n....................................................................\n");
 
         printf("\nInitializing HashTable with Linked List\n");
         s_hash = 500;
@@ -796,7 +796,7 @@ int main(int argc, char *argv[])
         printf("\nPrinting all words stored...\n");
         usleep(5000000);
         count_stored = get_info_link_all(words1, s_hash, true);
-        printf("\n Counting all words \n");
+        printf("\n ------------------------------------------------------------------ \n");
         printf("\n Words read - %ld\n", f1->word_num);
         printf(" Words stored - %d\n", count_stored);
     }
