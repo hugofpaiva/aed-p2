@@ -9,6 +9,78 @@
 #define plus_inf +1000000000  // a very large integer
 int count_array;              //Variável para ver quantos espaços do array estamos a usar
 
+static double cpu_time;       // Variavel utilizada para a contagem do tempo
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// code to measure the elapsed time used by a program fragment (an almost copy of elapsed_time.h)
+//
+// use as follows:
+//
+//   (void)elapsed_time();
+//   // put your code to be time measured here
+//   dt = elapsed_time();
+//   // put morecode to be time measured here
+//   dt = elapsed_time();
+//
+// elapsed_time() measures the CPU time between consecutive calls
+//
+
+#if defined(__linux__) || defined(__APPLE__)
+
+//
+// GNU/Linux and MacOS code to measure elapsed time
+//
+
+#include <time.h>
+
+static double elapsed_time(void)
+{
+  static struct timespec last_time, current_time;
+
+  last_time = current_time;
+  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current_time) != 0)
+    return -1.0; // clock_gettime() failed!!!
+  return ((double)current_time.tv_sec - (double)last_time.tv_sec) + 1.0e-9 * ((double)current_time.tv_nsec - (double)last_time.tv_nsec);
+}
+
+#endif
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+//
+// Microsoft Windows code to measure elapsed time
+//
+
+#include <windows.h>
+
+static double elapsed_time(void)
+{
+  static LARGE_INTEGER frequency, last_time, current_time;
+  static int first_time = 1;
+
+  if (first_time != 0)
+  {
+    QueryPerformanceFrequency(&frequency);
+    first_time = 0;
+  }
+  last_time = current_time;
+  QueryPerformanceCounter(&current_time);
+  return (double)(current_time.QuadPart - last_time.QuadPart) / (double)frequency.QuadPart;
+}
+
+#endif
+
+static void reset_time(void)
+{
+    printf("%s\n", "Time reseted");
+    cpu_time = 0.0;
+}
+
+
+
+
 typedef struct file_data
 {                  // public data
     long word_pos; // zero-based
@@ -630,9 +702,11 @@ int read_word(file_data_t *fd)
 void usage(char *argv[])
 {
     printf("Unknown option\n");
-    printf("\nUsage: %s -l -b\n\n", argv[0]);
+    printf("\nUsage: %s -l -b -t\n\n", argv[0]);
     printf("-l Initialize program using HashTable with Linked List\n");
     printf("-b Initialize program using HashTable with Ordered Binary Tree\n");
+    printf("-t Initialize program for Tests\n");
+
     exit(0);
 }
 
@@ -734,10 +808,13 @@ int main(int argc, char *argv[])
         fflush(stdin);
 
         printf("Initializing HashTable with Ordered Binary Tree\n");
+        reset_time();
         int s_hash = 500;
         int count_stored = 0;
+        (void)elapsed_time();
         tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
         file_data_t *f = malloc(sizeof(file_data_t));
+
         if (!open_text_file(file, f))
         {
             while (!read_word(f))
@@ -754,24 +831,66 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             exit(0);
         }
+
+        cpu_time = elapsed_time();
+        printf("%s %.6f s \n", "File read! Elapsed Time! - Reading", cpu_time);
+
+        FILE *fw = fopen("results.txt", "a+");
+
+        if (fw == NULL)
+        {
+            printf("Erro a abrir o ficheiro escrita!\n");
+            exit(1);
+        }
+        else
+        {
+            printf("%s\n", "Aberto ficheiro results.txt");
+            fprintf(fw, "Filename \t %s \n", file);
+            fprintf(fw, "HashTable OBT Reading Time \t %.6f \n", cpu_time);
+        }
+
+        reset_time();
+
+
         printf("\nPrinting all words stored...\n");
+        (void)elapsed_time();
         usleep(5000000);
         count_stored = get_info_node_all(words, s_hash);
         printf("\n ------------------------------------------------------------------ \n");
         printf("\n Words read - %ld\n", f->word_num);
         printf(" Words stored - %d\n", count_stored);
+        cpu_time = elapsed_time();
+        printf("%s %.6f s \n", "Tabel Traveled and Printed! Elapsed Time!", cpu_time);
+
+        if (fw == NULL)
+        {
+            printf("Erro a abrir o ficheiro results!\n");
+            exit(1);
+        }
+        else
+        {
+            fprintf(fw, "HashTable OBT Words Read \t %ld \n", f->word_num);
+            fprintf(fw, "HashTable OBT Words Stored \t %d \n", count_stored);
+            fprintf(fw, "HashTable OBT Time Travel Print \t %.6f \n", cpu_time);
+
+
+        }
 
         free(words);
         free(f);
         //--------------------------------------------------------------//
+
         printf("\n....................................................................\n");
 
         printf("\nInitializing HashTable with Linked List\n");
         s_hash = 500;
         count_array = 0;
         count_stored = 0;
+        reset_time();
+        (void)elapsed_time();
         link_ele **words1 = (link_ele *)calloc(s_hash, sizeof(link_ele *)); //cria e anuncia-os como zero(NULL)
         file_data_t *f1 = malloc(sizeof(file_data_t));
+
         if (!open_text_file(file, f1))
         {
             while (!read_word(f1))
@@ -793,12 +912,53 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             exit(0);
         }
+
+        cpu_time = elapsed_time();
+        printf("%s %.6f s \n", "File read! Elapsed Time! - Reading", cpu_time);
+
+        if (fw == NULL)
+        {
+            printf("Erro a abrir o ficheiro escrita!\n");
+            exit(1);
+        }
+        else
+        {
+            fprintf(fw, "Filename \t %s \n", file);
+            fprintf(fw, "HashTable LL Reading Time \t %.6f \n", cpu_time);
+        }
+
+        reset_time();
+
         printf("\nPrinting all words stored...\n");
+        (void)elapsed_time();
         usleep(5000000);
         count_stored = get_info_link_all(words1, s_hash, true);
         printf("\n ------------------------------------------------------------------ \n");
         printf("\n Words read - %ld\n", f1->word_num);
         printf(" Words stored - %d\n", count_stored);
+        cpu_time = elapsed_time();
+        printf("%s %.6f s \n", "Tabel Traveled and Printed! Elapsed Time!", cpu_time);
+
+        if (fw == NULL)
+        {
+            printf("Erro a abrir o ficheiro results!\n");
+            exit(1);
+        }
+        else
+        {
+            fprintf(fw, "HashTable LL Words Read \t %ld \n", f->word_num);
+            fprintf(fw, "HashTable LL Words Stored \t %d \n", count_stored);
+            fprintf(fw, "HashTable LL Time Travel Print \t %.6f \n", cpu_time);
+
+
+        }
+
+
+        fclose(fw);
+        free(words1);
+        free(f1);
+
+
     }
     else
     {
