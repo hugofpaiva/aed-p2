@@ -1,0 +1,12 @@
+Filename 	 SherlockHolmes.txt 
+HashTable OBT Reading Time 	 0.286727 
+HashTable OBT Words Read 	 657438 
+HashTable OBT Words Stored 	 657438 
+Number of different word 45882 
+HashTable OBT Time Travel Print 	 1.115338 
+Filename 	 SherlockHolmes.txt 
+HashTable LL Reading Time 	 0.395092 
+HashTable LL Words Read 	 657438 
+HashTable LL Words Stored 	 657438 
+Number of different word 46034 
+HashTable LL Time Travel Print 	 1.122216 
