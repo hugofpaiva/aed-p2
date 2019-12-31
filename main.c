@@ -272,7 +272,6 @@ link_ele **resize_link(link_ele **words, int *size)
     return words_temp;
 }
 
-/*
 void get_info_link(link_ele **words, int size)
 {
     char name[64];
@@ -324,7 +323,7 @@ void get_info_link(link_ele **words, int size)
         printf("Word %s not found!\n", name);
         exit(0);
     }
-}*/
+}
 
 void get_info_node(tree_node **words, int size)
 {
@@ -385,8 +384,7 @@ void get_info_node(tree_node **words, int size)
     }
 }
 
-
-void get_info_link(link_ele **words, int size)
+void get_info_link_all(link_ele **words, int size)
 {
     bool found = false;
     char name[64];
@@ -562,6 +560,7 @@ int main(int argc, char *argv[])
                 add_ele(words, f, s_hash);
             }
             printf("File read successfully!\n");
+            close_text_file(f);
         }
         else
         {
@@ -570,9 +569,20 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             exit(0);
         }
-        printf("\n")
-        get_info_link(words, s_hash);
-        close_text_file(f);
+        printf("\n1 - Search for a certain word stats\n2 - Search with a piece of a word or list all words stats\n");
+        char option[5];
+        printf("\nOption: ");
+        scanf("%[^\n]", option);
+        fflush(stdin);
+        if (strcmp(option, "1") == 0)
+            get_info_link(words, s_hash);
+        else if (strcmp(option, "2") == 0)
+            get_info_link_all(words, s_hash);
+        else
+        {
+            printf("Invalid option");
+            exit(0);
+        }
     }
     else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
     {
@@ -591,6 +601,7 @@ int main(int argc, char *argv[])
                 add_node(words, f, s_hash);
             }
             printf("File read successfully!\n");
+            close_text_file(f);
         }
         else
         {
@@ -599,8 +610,21 @@ int main(int argc, char *argv[])
             printf("------------------\n");
             exit(0);
         }
-        get_info_node(words, s_hash);
-        close_text_file(f);
+        printf("\n1 - Search for a certain word stats\n2 - Show all words stats\n");
+        char option[5];
+        printf("\nOption: ");
+        scanf("%[^\n]", option);
+        fflush(stdin);
+        if (strcmp(option, "1") == 0)
+            get_info_node(words, s_hash); 
+        else if (strcmp(option, "2") == 0)
+            get_info_node_all(words, s_hash);
+        else
+        {
+            printf("Invalid option");
+            exit(0);
+        }
+           
     }
     else
     {
