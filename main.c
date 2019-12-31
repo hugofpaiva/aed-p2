@@ -8,12 +8,11 @@
 #define minus_inf -1000000000 // a very small integer
 #define plus_inf +1000000000  // a very large integer
 int count_array;              //Variável para ver quantos espaços do array estamos a usar
-// wc SherlockHolmes.txt  shell command count words by space
 
-typedef struct file_data //com typedef não preciso de estar sempre a escrever struck file_data_t NOT SURE
-{                        // public data
-    long word_pos;       // zero-based
-    long word_num;       // zero-based
+typedef struct file_data
+{                  // public data
+    long word_pos; // zero-based
+    long word_num; // zero-based
     char word[64];
     // private data
     FILE *fp;
@@ -384,6 +383,104 @@ void get_info_node(tree_node **words, int size)
     }
 }
 
+void get_info_node_all(tree_node **words, int size)
+{
+
+    bool found = false;
+    for (int i = 0; i < size; i++)
+    {
+        tree_node *actual = words[i];
+        tree_node *pre;
+        if (actual != NULL)
+        {
+            while (actual != NULL)
+            {
+                if (actual->left == NULL)
+                {
+                    printf("\nInformation about word '%s'\n", actual->word);
+                    printf("\nCount: %ld\n", actual->count);
+                    printf("\nPosition (related to the index position of all the text):\n");
+                    printf("First: %ld\n", actual->first);
+                    printf("Last: %ld\n", actual->last);
+                    printf("\nPosition (related to the distinct word counter):\n");
+                    printf("First: %ld\n", actual->firstp);
+                    printf("Last: %ld\n", actual->lastp);
+                    if (actual->count > 1)
+                    {
+                        printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                        printf("Smallest: %ld\n", actual->dminp);
+                        printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                        printf("Largest: %ld\n", actual->dmaxp);
+                        printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                        printf("Smallest: %ld\n", actual->dmin);
+                        printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                        printf("Largest: %ld\n\n", actual->dmax);
+                    }
+                    else
+                    {
+                        printf("\n No distances stats available.\n\n");
+                    }
+                    found = true;
+                    actual = actual->right;
+                }
+                else
+                {
+                    /* Find the inorder predecessor of current */
+                    pre = actual->left;
+                    while (pre->right != NULL && pre->right != actual)
+                        pre = pre->right;
+
+                    /* Make current as the right child of its inorder  
+               predecessor */
+                    if (pre->right == NULL)
+                    {
+                        pre->right = actual;
+                        actual = actual->left;
+                    }
+
+                    /* Revert the changes made in the 'if' part to restore  
+               the original tree i.e., fix the right child 
+               of predecessor */
+                    else
+                    {
+                        pre->right = NULL;
+                        printf("\nInformation about word '%s'\n", actual->word);
+                        printf("\nCount: %ld\n", actual->count);
+                        printf("\nPosition (related to the index position of all the text):\n");
+                        printf("First: %ld\n", actual->first);
+                        printf("Last: %ld\n", actual->last);
+                        printf("\nPosition (related to the distinct word counter):\n");
+                        printf("First: %ld\n", actual->firstp);
+                        printf("Last: %ld\n", actual->lastp);
+                        if (actual->count > 1)
+                        {
+                            printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
+                            printf("Smallest: %ld\n", actual->dminp);
+                            printf("Average: %.2f\n", (float)(actual->tdistp) / (actual->count - 1)); //-1 porque quero o numero de distancias e não de palavras
+                            printf("Largest: %ld\n", actual->dmaxp);
+                            printf("\nDistances beetween consecutive occurrences (related to the distinct word counter):\n");
+                            printf("Smallest: %ld\n", actual->dmin);
+                            printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
+                            printf("Largest: %ld\n\n", actual->dmax);
+                        }
+                        else
+                        {
+                            printf("\n No distances stats available.\n\n");
+                        }
+                        found = true;
+                        actual = actual->right;
+                    }
+                }
+            }
+        }
+    }
+    if (!found)
+    {
+        printf("No words found!\n");
+        exit(0);
+    }
+}
+
 void get_info_link_all(link_ele **words, int size)
 {
     bool found = false;
@@ -472,7 +569,7 @@ void get_info_link_all(link_ele **words, int size)
     }
     if (!found)
     {
-        printf("Word %s (or words starting with it) not found!\n", name);
+        printf("No words found!\n");
         exit(0);
     }
     fflush(stdin);
@@ -529,18 +626,18 @@ int read_word(file_data_t *fd)
 void usage(char *argv[])
 {
     printf("Unknown option\n");
-    printf("\nUsage: %s -h -t\n\n", argv[0]);
-    printf("-h Initialize program using HashTable\n");
-    printf("-t Initialize program using Ordered Binary Tree\n");
+    printf("\nUsage: %s -l -b\n\n", argv[0]);
+    printf("-l Initialize program using HashTable with Linked List\n");
+    printf("-b Initialize program using HashTable with Ordered Binary Tree\n");
     exit(0);
 }
 
 int main(int argc, char *argv[])
 {
-    if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h')
+    if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'l')
     {
         count_array = 0;
-        printf("Initializing HashTable\n");
+        printf("Initializing HashTable with Linked List\n");
         int s_hash = 500;
         link_ele **words = (link_ele *)calloc(s_hash, sizeof(link_ele *)); //cria e anuncia-os como zero(NULL)
         file_data_t *f = malloc(sizeof(file_data_t));
@@ -584,9 +681,9 @@ int main(int argc, char *argv[])
             exit(0);
         }
     }
-    else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 't')
+    else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'b')
     {
-        printf("Initializing Ordered Binary Tree\n");
+        printf("Initializing HashTable with Ordered Binary Tree\n");
         int s_hash = 500;
         tree_node **words = (tree_node *)calloc(s_hash, sizeof(tree_node *)); //cria e anuncia-os como zero(NULL)
         file_data_t *f = malloc(sizeof(file_data_t));
@@ -616,7 +713,7 @@ int main(int argc, char *argv[])
         scanf("%[^\n]", option);
         fflush(stdin);
         if (strcmp(option, "1") == 0)
-            get_info_node(words, s_hash); 
+            get_info_node(words, s_hash);
         else if (strcmp(option, "2") == 0)
             get_info_node_all(words, s_hash);
         else
@@ -624,7 +721,6 @@ int main(int argc, char *argv[])
             printf("Invalid option");
             exit(0);
         }
-           
     }
     else
     {
