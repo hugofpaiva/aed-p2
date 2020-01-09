@@ -32,5 +32,8 @@ All the details, including the results, can be found in the [Work Report](/relat
 
  - **Hugo Paiva de Almeida - 93195**
  - **João Laranjo - 91153**
+ 
+## Grade
+Evaluated with **19** out of 20.
 
 
