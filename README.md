@@ -2,6 +2,16 @@
 
 # AED Problem #2
 
+The main goal of this second practical work was to implement a Hash Table where it would be stored all the different words present in a text file. Each entry of that Table should be a structure capable of storing:
+
+- The number of occurrences of each distinct word  
+- The location of the first and last occurrences of each distinct word  
+- The smallest, largest, and average distances between consecutive occurrences of the same distinct word
+
+As a mean of comparison, the Hash Table was developed using two different structures for each table entry: a Linked List and a Ordered Binary Tree. By this way, it was possible to compare times of search and execution between them.
+
+Lastly, it was also asked that the Table should grow dynamically. This means that when the Table is nearly full, it should be resized to a larger size.
+
 ##  Getting Started
 These instructions will help to compile and run developed programs on your local machine.
 
