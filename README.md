@@ -34,6 +34,6 @@ All the details, including the results, can be found in the [Work Report](/relat
  - **João Laranjo - 91153**
  
 ## Grade
-Evaluated with **19** out of 20.
+Evaluated with **16** out of 20.
 
 
