@@ -40,8 +40,8 @@ All the details, including the results, can be found in the [Work Report](/relat
 
 ## Authors
 
- - **Hugo Paiva de Almeida - 93195**
- - **João Laranjo - 91153**
+ - **[Hugo Paiva de Almeida](https://github.com/hugofpaiva) - 93195**
+ - **[João Laranjo](https://github.com/joaolaranjo) - 91153**
  
 ## Grade
 Evaluated with **16** out of 20.
