@@ -9,10 +9,9 @@
 #define plus_inf +1000000000  // a very large integer
 int count_array;              // array size being used
 
-int count_diff;               // different word counter
+int count_diff; // different word counter
 
-static double cpu_time;       // time counter
-
+static double cpu_time; // time counter
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -39,12 +38,12 @@ static double cpu_time;       // time counter
 
 static double elapsed_time(void)
 {
-  static struct timespec last_time, current_time;
+    static struct timespec last_time, current_time;
 
-  last_time = current_time;
-  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current_time) != 0)
-    return -1.0; // clock_gettime() failed!!!
-  return ((double)current_time.tv_sec - (double)last_time.tv_sec) + 1.0e-9 * ((double)current_time.tv_nsec - (double)last_time.tv_nsec);
+    last_time = current_time;
+    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current_time) != 0)
+        return -1.0; // clock_gettime() failed!!!
+    return ((double)current_time.tv_sec - (double)last_time.tv_sec) + 1.0e-9 * ((double)current_time.tv_nsec - (double)last_time.tv_nsec);
 }
 
 #endif
@@ -59,17 +58,17 @@ static double elapsed_time(void)
 
 static double elapsed_time(void)
 {
-  static LARGE_INTEGER frequency, last_time, current_time;
-  static int first_time = 1;
+    static LARGE_INTEGER frequency, last_time, current_time;
+    static int first_time = 1;
 
-  if (first_time != 0)
-  {
-    QueryPerformanceFrequency(&frequency);
-    first_time = 0;
-  }
-  last_time = current_time;
-  QueryPerformanceCounter(&current_time);
-  return (double)(current_time.QuadPart - last_time.QuadPart) / (double)frequency.QuadPart;
+    if (first_time != 0)
+    {
+        QueryPerformanceFrequency(&frequency);
+        first_time = 0;
+    }
+    last_time = current_time;
+    QueryPerformanceCounter(&current_time);
+    return (double)(current_time.QuadPart - last_time.QuadPart) / (double)frequency.QuadPart;
 }
 
 #endif
@@ -79,9 +78,6 @@ static void reset_time(void)
     printf("%s\n", "Time reseted");
     cpu_time = 0.0;
 }
-
-
-
 
 typedef struct file_data
 {                  // public data
@@ -247,7 +243,7 @@ void add_ele(link_ele **words, file_data_t *f, int size)
 {
     int index = hash_function(f->word, size);
     link_ele *actual = words[index];
-    if (actual != NULL) // if an element in the list already exists in that index 
+    if (actual != NULL) // if an element in the list already exists in that index
     {
         if (strcmp(actual->word, f->word) == 0)
         { // if equal
@@ -313,7 +309,7 @@ void add_ele(link_ele **words, file_data_t *f, int size)
         }
     }
     else
-    {   // New Start of a linked list
+    { // New Start of a linked list
         count_array++;
         link_ele *new = malloc(sizeof(link_ele));
         strcpy(new->word, f->word);
@@ -332,6 +328,65 @@ void add_ele(link_ele **words, file_data_t *f, int size)
     }
 }
 
+void add_ele_resize(link_ele **words, link_ele *f, int size)
+{
+    int index = hash_function(f->word, size);
+    link_ele *actual = words[index];
+    if (actual != NULL)
+    {
+        while (actual->next != NULL)
+        {
+            actual = actual->next;
+        }
+        actual = actual->next;
+        link_ele *temp = malloc(sizeof(link_ele));
+        strcpy(temp->word, f->word);
+        temp->next = NULL;
+        temp->count = f->count;
+        temp->dmin = f->dmin;
+        temp->dmax = f->dmax;
+        temp->dminp = f->dminp;
+        temp->dmaxp = f->dmaxp;
+        temp->first = f->first;
+        temp->count = f->count;
+        temp->last = f->last;
+        temp->lastp = f->lastp;
+        temp->firstp = f->firstp;
+
+    }
+    else
+    {
+        link_ele *new = malloc(sizeof(link_ele));
+        strcpy(new->word, f->word);
+        new->next = NULL;
+        new->count = f->count;
+        new->dmin = f->dmin;
+        new->dmax = f->dmax;
+        new->dminp = f->dminp;
+        new->dmaxp = f->dmaxp;
+        new->first = f->first;
+        new->count = f->count;
+        new->last = f->last;
+        new->lastp = f->lastp;
+        new->firstp = f->firstp;
+        words[index] = new;
+    }
+
+    char word[64];
+    long count;            // word counter
+    long tdist;            // total sum of distances (in relation to the general word counter)
+    long tdistp;           // total sum of distances (in relation to the index position)
+    long dmin;             // min distance (in relation to the general word counter)
+    long dmax;             // max distance (in relation to the general word counter)
+    long dminp;            // min distance (in relation to the index position)
+    long dmaxp;            // max distance (in relation to the index position)
+    long last;             // last position (in relation to the general word counter)
+    long first;            // first position (in relation to the general word counter)
+    long lastp;            // last position (in relation to the index position)
+    long firstp;           // first position (in relation to the index position)
+    struct link_ele *next; // next word pointer
+}
+
 link_ele **resize_link(link_ele **words, int *size)
 {
     int newsize = 2 * (*size);
@@ -340,8 +395,12 @@ link_ele **resize_link(link_ele **words, int *size)
     {
         if (words[i] != NULL)
         {
-            int index = hash_function(words[i]->word, newsize);
-            words_temp[index] = words[i];
+            link_ele *actual = words[i];
+            while (actual->next != NULL)
+            {
+                add_ele_resize(words_temp, actual, newsize);
+                actual = actual->next;
+            }
         }
     }
     *size = 2 * (*size);
@@ -858,7 +917,6 @@ int main(int argc, char *argv[])
 
         reset_time();
 
-
         printf("\nPrinting all words stored...\n");
         (void)elapsed_time();
         usleep(5000000);
@@ -881,7 +939,6 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable OBT Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable OBT Time Travel Print \t %.6f \n", cpu_time);
-
         }
 
         free(words);
@@ -959,16 +1016,11 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable LL Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable LL Time Travel Print \t %.6f \n", cpu_time);
-
-
         }
-
 
         fclose(fw);
         free(words1);
         free(f1);
-
-
     }
     else
     {
