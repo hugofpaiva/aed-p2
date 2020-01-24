@@ -371,20 +371,6 @@ void add_ele_resize(link_ele **words, link_ele *f, int size)
         new->firstp = f->firstp;
         words[index] = new;
     }
-
-    char word[64];
-    long count;            // word counter
-    long tdist;            // total sum of distances (in relation to the general word counter)
-    long tdistp;           // total sum of distances (in relation to the index position)
-    long dmin;             // min distance (in relation to the general word counter)
-    long dmax;             // max distance (in relation to the general word counter)
-    long dminp;            // min distance (in relation to the index position)
-    long dmaxp;            // max distance (in relation to the index position)
-    long last;             // last position (in relation to the general word counter)
-    long first;            // first position (in relation to the general word counter)
-    long lastp;            // last position (in relation to the index position)
-    long firstp;           // first position (in relation to the index position)
-    struct link_ele *next; // next word pointer
 }
 
 link_ele **resize_link(link_ele **words, int *size)
