@@ -509,6 +509,18 @@ int get_info_node_all(tree_node **words, int size)
 {
     int c_stored = 0;
     count_diff = 0;
+    FILE *f_node_all = fopen("results_fna.txt", "a+");
+    if (f_node_all == NULL)
+    {
+        printf("Erro a abrir o ficheiro escrita!\n");
+        exit(1);
+    }
+    else
+    {
+        printf("%s\n", "Aberto ficheiro results_fna.txt");
+    }
+
+    fprintf(f_node_all, "Word \t Count \t FPos \t LPos \t Dmin \t AvgD \t Dmax \n");
     bool found = false;
     for (int i = 0; i < size; i++)
     {
@@ -530,6 +542,7 @@ int get_info_node_all(tree_node **words, int size)
                     printf("\nPosition (related to the distinct word counter):\n");
                     printf("First: %ld\n", actual->firstp);
                     printf("Last: %ld\n", actual->lastp);
+                    fprintf(f_node_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
                     if (actual->count > 1)
                     {
                         printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
@@ -540,10 +553,12 @@ int get_info_node_all(tree_node **words, int size)
                         printf("Smallest: %ld\n", actual->dmin);
                         printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
                         printf("Largest: %ld\n\n", actual->dmax);
+                        fprintf(f_node_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
                     }
                     else
                     {
                         printf("\n No distances stats available.\n\n");
+                        fprintf(f_node_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                     }
                     found = true;
                     actual = actual->right;
@@ -579,6 +594,8 @@ int get_info_node_all(tree_node **words, int size)
                         printf("\nPosition (related to the distinct word counter):\n");
                         printf("First: %ld\n", actual->firstp);
                         printf("Last: %ld\n", actual->lastp);
+                        fprintf(f_node_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
+                    
                         if (actual->count > 1)
                         {
                             printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
@@ -589,10 +606,13 @@ int get_info_node_all(tree_node **words, int size)
                             printf("Smallest: %ld\n", actual->dmin);
                             printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
                             printf("Largest: %ld\n\n", actual->dmax);
+                            fprintf(f_node_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
+                    
                         }
                         else
                         {
                             printf("\n No distances stats available.\n\n");
+                            fprintf(f_node_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                         }
                         found = true;
                         actual = actual->right;
@@ -614,6 +634,7 @@ int get_info_link_all(link_ele **words, int size, bool all)
     bool found = false;
     int c_st = 0;
     count_diff = 0;
+    FILE *f_link_all = fopen("results_fla.txt", "a+");
     if (all == true)
         goto all;
     char name[64];
@@ -660,6 +681,19 @@ int get_info_link_all(link_ele **words, int size, bool all)
     else
     {
     all:
+
+        if (f_link_all == NULL)
+        {
+            printf("Erro a abrir o ficheiro escrita!\n");
+            exit(1);
+        }
+        else
+        {
+            printf("%s\n", "Aberto ficheiro results_fla.txt");
+        }
+
+        fprintf(f_link_all, "Word \t Count \t FPos \t LPos \t Dmin \t AvgD \t Dmax \n");
+
         for (int i = 0; i < size; i++)
         {
             link_ele *actual = words[i];
@@ -668,6 +702,7 @@ int get_info_link_all(link_ele **words, int size, bool all)
                 found = true;
                 c_st += actual->count;
                 count_diff++;
+                fprintf(f_link_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
                 printf("\nInformation about word '%s'\n", actual->word);
                 printf("\nCount: %ld\n", actual->count);
                 printf("\nPosition (related to the index position of all the text):\n");
@@ -686,15 +721,19 @@ int get_info_link_all(link_ele **words, int size, bool all)
                     printf("Smallest: %ld\n", actual->dmin);
                     printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
                     printf("Largest: %ld\n\n", actual->dmax);
+
+                    fprintf(f_link_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
                 }
                 else
                 {
+                    fprintf(f_link_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                     printf("\nNo distances stats available.\n\n");
                 }
 
                 actual = actual->next;
             }
         }
+        fclose(f_link_all);
     }
     if (!found)
     {
