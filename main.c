@@ -338,7 +338,6 @@ void add_ele_resize(link_ele **words, link_ele *f, int size)
         {
             actual = actual->next;
         }
-        actual = actual->next;
         link_ele *temp = malloc(sizeof(link_ele));
         strcpy(temp->word, f->word);
         temp->next = NULL;
@@ -352,6 +351,7 @@ void add_ele_resize(link_ele **words, link_ele *f, int size)
         temp->last = f->last;
         temp->lastp = f->lastp;
         temp->firstp = f->firstp;
+        actual->next = temp;
 
     }
     else
@@ -382,10 +382,12 @@ link_ele **resize_link(link_ele **words, int *size)
         if (words[i] != NULL)
         {
             link_ele *actual = words[i];
+            add_ele_resize(words_temp, actual, newsize);
             while (actual->next != NULL)
             {
-                add_ele_resize(words_temp, actual, newsize);
                 actual = actual->next;
+                add_ele_resize(words_temp, actual, newsize);
+                
             }
         }
     }
