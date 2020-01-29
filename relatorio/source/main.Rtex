@@ -116,7 +116,7 @@
 	{\normalsize DETI \\ 
 		Universidade de Aveiro \par}
 		
-	{\normalsize 31-12-2019 \par}
+	{\normalsize 29-01-2020 \par}
 	\vspace{2cm}
 	\pagebreak
 
@@ -556,17 +556,75 @@ void add_ele(link_ele **words, file_data_t *f, int size)
 
 \end{lstlisting}
 
+\subsection{Add Element to list using resize}
+
+\par This function was needed to add a word with all the required information from the old Table to the new one, when doing the resize.
+
+\par A hash-code is generated to the word being read from the old array introduced into the function, in order to know where to store the word information.
+
+\par Thereafter, it is verified if that position contains an element or if it's doesn't (\textit{NULL}). If it doesn't contains, a new element will be created, storing all the information and being the first one on the Linked List of that index. If it contains, the Linked List is traveled until the first empty position is founded and a new node is created with the information of the word.
+
+\begin{lstlisting}[style=CStyle]
+
+void add_ele_resize(link_ele **words, link_ele *f, int size)
+{
+    int index = hash_function(f->word, size);
+    link_ele *actual = words[index];
+    if (actual != NULL)
+    {
+        while (actual->next != NULL)
+        {
+            actual = actual->next;
+        }
+        link_ele *temp = malloc(sizeof(link_ele));
+        strcpy(temp->word, f->word);
+        temp->next = NULL;
+        temp->count = f->count;
+        temp->dmin = f->dmin;
+        temp->dmax = f->dmax;
+        temp->dminp = f->dminp;
+        temp->dmaxp = f->dmaxp;
+        temp->first = f->first;
+        temp->count = f->count;
+        temp->last = f->last;
+        temp->lastp = f->lastp;
+        temp->firstp = f->firstp;
+        actual->next = temp;
+
+    }
+    else
+    {
+        link_ele *new = malloc(sizeof(link_ele));
+        strcpy(new->word, f->word);
+        new->next = NULL;
+        new->count = f->count;
+        new->dmin = f->dmin;
+        new->dmax = f->dmax;
+        new->dminp = f->dminp;
+        new->dmaxp = f->dmaxp;
+        new->first = f->first;
+        new->count = f->count;
+        new->last = f->last;
+        new->lastp = f->lastp;
+        new->firstp = f->firstp;
+        words[index] = new;
+    }
+}
+
+\end{lstlisting}
+
+
 \subsection{Resize}
 
 \par To avoid collisions (same hash-codes for different words) the next function was developed. Note that it only makes sense to develop a resize function for Linked Lists. Binary Trees are supposed to enhance our search efficiency, resizing them would not make any difference.
 
 \par Every time the Table was almost full (it was decided to resize at 80\% of occupation) the the Table was resized to a bigger size. All the information is stored using \textit{words\_temp} and then returned.
 
-\par In a more detailed description, the size of the new array was decided to be twice the size of the older one. Then a temporary array was created, all hash-codes were generated and words stored on that new array. After that, the new array is simply returned.
+\par In a more detailed description, the size of the new array was decided to be twice the size of the older one. Then a temporary array was created and the words were stored on that new array, using a the function "Add Element to list using resize". After that, the new array is simply returned.
 
 \begin{lstlisting}[style=CStyle]
 
-link_ele **resize_link(link_ele **words, int *size)
+ink_ele **resize_link(link_ele **words, int *size)
 {
     int newsize = 2 * (*size);
     link_ele **words_temp = (link_ele *)calloc(newsize, sizeof(link_ele *));
@@ -574,8 +632,14 @@ link_ele **resize_link(link_ele **words, int *size)
     {
         if (words[i] != NULL)
         {
-            int index = hash_function(words[i]->word, newsize);
-            words_temp[index] = words[i];
+            link_ele *actual = words[i];
+            add_ele_resize(words_temp, actual, newsize);
+            while (actual->next != NULL)
+            {
+                actual = actual->next;
+                add_ele_resize(words_temp, actual, newsize);
+                
+            }
         }
     }
     *size = 2 * (*size);
@@ -972,7 +1036,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words = resize_link(words, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words, f, s_hash);
             }
@@ -1093,7 +1156,6 @@ int main(int argc, char *argv[])
 
         reset_time();
 
-
         printf("\nPrinting all words stored...\n");
         (void)elapsed_time();
         usleep(5000000);
@@ -1116,7 +1178,6 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable OBT Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable OBT Time Travel Print \t %.6f \n", cpu_time);
-
         }
 
         free(words);
@@ -1141,7 +1202,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words1 = resize_link(words1, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words1, f1, s_hash);
             }
@@ -1194,22 +1254,18 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable LL Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable LL Time Travel Print \t %.6f \n", cpu_time);
-
-
         }
-
 
         fclose(fw);
         free(words1);
         free(f1);
-
-
     }
     else
     {
         usage(argv);
     }
 }
+
 
 \end{lstlisting}
 
@@ -1218,41 +1274,19 @@ int main(int argc, char *argv[])
 
 \section{Results}
 
-\par \textbf{ After running the program using the -t option, explained previously, the following results were obtained:}
+\par \textbf{ After running the program using the -t option, explained previously, without printing the words, the following results\footnote{The following results were obtained using the files \href{https://drive.google.com/open?id=1ZK23HOKmfthNKzLQmgtbHxfl4G4Mvsn6}{\textit{SherlockHolmes.txt}} and \href{https://drive.google.com/open?id=1T9DnBZPU96hdQc50Dm6gSbUyjoE48c9n}{\textit{test.txt}}} were obtained:}
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[scale=0.8]{images/sherlock_results.png}
+    \includegraphics[scale=0.55]{test/sherlock.png}
     \caption{Results after running the program using the -t option and reading from the file \textit{SherlockHolmes.txt}}
 \end{figure}
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[scale=0.8]{images/test_results.png}
+    \includegraphics[scale=0.55]{test/test.png}
     \caption{Results after running the program using the -t option and reading from the file \textit{test.txt}}
 \end{figure}
-
-\clearpage
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=\textwidth]{images/travel_speed.jpg}
-    \caption{Time spent while travelling through all the words from the \textit{SherlockHolmes.txt} file, according to the number of times the program has ran and for both, Liked List and Ordered Binary Tree structs}
-\end{figure}
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=\textwidth]{images/reading_speed.jpg}
-    \caption{Time spent while reading all the words from the \textit{SherlockHolmes.txt} file, according to the number of times the program has ran and for both, Liked List and Ordered Binary Tree structs}
-\end{figure}
-
-\clearpage
-
-\par From the previous results it can be stated that the reading time for both, Linked List and Ordered Binary Tree structs are very similar. The number of words read and stored in the Table are the same. This proves that every word read was processed and stored.
-
-\par Travel and reading time across the Tables with Linked Lists and Ordered Binary Trees, are also very similar.
-
-\par Note that, somehow, the number of different words using Ordered Binary Trees and Linked Lists are not the same. This only happens to the \href{https://drive.google.com/open?id=1ZK23HOKmfthNKzLQmgtbHxfl4G4Mvsn6}{\textit{SherlockHolmes.txt}} file. Different files were used, like \href{https://drive.google.com/open?id=1T9DnBZPU96hdQc50Dm6gSbUyjoE48c9n}{\textit{test.txt}} and the number was the same.
 
 \clearpage
 
@@ -1279,10 +1313,66 @@ int main(int argc, char *argv[])
 
 \par There are no figures of the options for printing all the words because they are not relevant for this example.
 
+\clearpage
+
+\par \textbf{Using the data acquired from the reading the files using the program:}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.3]{images/travel_speed.jpg}
+    \caption{Time spent while travelling through all the words from the \textit{SherlockHolmes.txt} file, according to the number of times the program has ran and for both, Linked List and Ordered Binary Tree structs}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.27]{images/reading_speed.jpg}
+    \caption{Time spent while reading all the words from the \textit{SherlockHolmes.txt} file, according to the number of times the program has ran and for both, Linked List and Ordered Binary Tree structs}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.3]{results/l_nW_nOcc.jpg}
+    \caption{Number of occurrences of different words on the \textit{test.txt} file, using Linked List struct}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.3]{results/n_dW_nOcc.jpg}
+    \caption{Number of occurrences of different words on the \textit{test.txt} file, using Ordered Binary Tree struct}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.3]{results/linked_list_taxa_ocu_sherlock.jpg}
+    \caption{Table occupancy rate relative to the number of words read, on the \textit{SherlockHolmes.txt} file, using Linked List struct}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.3]{results/linked_list_taxa_ocu_test.jpg}
+    \caption{Table occupancy rate relative to the number of words read, on the \textit{test.txt} file, using Linked List struct}
+\end{figure}
+
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.32]{results/max_avg_min.jpg}
+    \caption{Maximum (red), average (blue) and minimum (green) distances between consecutive words, on the \textit{test.txt} file}
+\end{figure}
 
 
 
+\clearpage
 
+\par From the previous results it can be stated that the reading time for both, Linked List and Ordered Binary Tree structs are very similar however, the number of words read and stored in the Table are the same. This proves that every word read was processed and stored.
+
+\par It can also be seen that, no matter if it is used Ordered Binary Tree or Linked List structs, the number of occurrences of different words are the same, proving a correct reading.
+
+\par Furthermore, as expected, the resize of the Table worked as it was designed, lowering its occupancy rate to half when it was at eighty percent of its capacity.
+
+\par Analyzing Figure 11, sometimes there is only a distance recorded so, the minimum and maximum are the same. In these cases, the minimum is visible instead of the maximum.
+
+\par Travel and reading time across the Tables with Linked Lists and Ordered Binary Trees are also very similar.
 
 \clearpage
 
@@ -1290,7 +1380,7 @@ int main(int argc, char *argv[])
 
 \par During the development of this practical work it was expected that the search time of the Ordered Binary Tree was less than the time of the Linked List implementation. This was expected because of the fact that the Tree is ordered while the Lists are not. From the results previously obtained, although the time of travel through the Ordered Binary Tree is, sometimes less, both implementations behave in a very similar way. They have a similar reading and search time, which was not accord what was expected.
 
-\par 
+\par Initially, there was also some confusion on how to resize the Table but, after many errors, the group came to a conclusion that every word should be hashed and added to the new Table, instead of an entire Linked List of an index.
 
 \par Other than this, according to the goals set by the teachers, the work was a success.
 
@@ -1324,10 +1414,9 @@ int main(int argc, char *argv[])
 #define plus_inf +1000000000  // a very large integer
 int count_array;              // array size being used
 
-int count_diff;               // different word counter
+int count_diff; // different word counter
 
-static double cpu_time;       // time counter
-
+static double cpu_time; // time counter
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1354,12 +1443,12 @@ static double cpu_time;       // time counter
 
 static double elapsed_time(void)
 {
-  static struct timespec last_time, current_time;
+    static struct timespec last_time, current_time;
 
-  last_time = current_time;
-  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current_time) != 0)
-    return -1.0; // clock_gettime() failed!!!
-  return ((double)current_time.tv_sec - (double)last_time.tv_sec) + 1.0e-9 * ((double)current_time.tv_nsec - (double)last_time.tv_nsec);
+    last_time = current_time;
+    if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current_time) != 0)
+        return -1.0; // clock_gettime() failed!!!
+    return ((double)current_time.tv_sec - (double)last_time.tv_sec) + 1.0e-9 * ((double)current_time.tv_nsec - (double)last_time.tv_nsec);
 }
 
 #endif
@@ -1374,17 +1463,17 @@ static double elapsed_time(void)
 
 static double elapsed_time(void)
 {
-  static LARGE_INTEGER frequency, last_time, current_time;
-  static int first_time = 1;
+    static LARGE_INTEGER frequency, last_time, current_time;
+    static int first_time = 1;
 
-  if (first_time != 0)
-  {
-    QueryPerformanceFrequency(&frequency);
-    first_time = 0;
-  }
-  last_time = current_time;
-  QueryPerformanceCounter(&current_time);
-  return (double)(current_time.QuadPart - last_time.QuadPart) / (double)frequency.QuadPart;
+    if (first_time != 0)
+    {
+        QueryPerformanceFrequency(&frequency);
+        first_time = 0;
+    }
+    last_time = current_time;
+    QueryPerformanceCounter(&current_time);
+    return (double)(current_time.QuadPart - last_time.QuadPart) / (double)frequency.QuadPart;
 }
 
 #endif
@@ -1394,9 +1483,6 @@ static void reset_time(void)
     printf("%s\n", "Time reseted");
     cpu_time = 0.0;
 }
-
-
-
 
 typedef struct file_data
 {                  // public data
@@ -1562,7 +1648,7 @@ void add_ele(link_ele **words, file_data_t *f, int size)
 {
     int index = hash_function(f->word, size);
     link_ele *actual = words[index];
-    if (actual != NULL) // if an element in the list already exists in that index 
+    if (actual != NULL) // if an element in the list already exists in that index
     {
         if (strcmp(actual->word, f->word) == 0)
         { // if equal
@@ -1628,7 +1714,7 @@ void add_ele(link_ele **words, file_data_t *f, int size)
         }
     }
     else
-    {   // New Start of a linked list
+    { // New Start of a linked list
         count_array++;
         link_ele *new = malloc(sizeof(link_ele));
         strcpy(new->word, f->word);
@@ -1647,6 +1733,51 @@ void add_ele(link_ele **words, file_data_t *f, int size)
     }
 }
 
+void add_ele_resize(link_ele **words, link_ele *f, int size)
+{
+    int index = hash_function(f->word, size);
+    link_ele *actual = words[index];
+    if (actual != NULL)
+    {
+        while (actual->next != NULL)
+        {
+            actual = actual->next;
+        }
+        link_ele *temp = malloc(sizeof(link_ele));
+        strcpy(temp->word, f->word);
+        temp->next = NULL;
+        temp->count = f->count;
+        temp->dmin = f->dmin;
+        temp->dmax = f->dmax;
+        temp->dminp = f->dminp;
+        temp->dmaxp = f->dmaxp;
+        temp->first = f->first;
+        temp->count = f->count;
+        temp->last = f->last;
+        temp->lastp = f->lastp;
+        temp->firstp = f->firstp;
+        actual->next = temp;
+
+    }
+    else
+    {
+        link_ele *new = malloc(sizeof(link_ele));
+        strcpy(new->word, f->word);
+        new->next = NULL;
+        new->count = f->count;
+        new->dmin = f->dmin;
+        new->dmax = f->dmax;
+        new->dminp = f->dminp;
+        new->dmaxp = f->dmaxp;
+        new->first = f->first;
+        new->count = f->count;
+        new->last = f->last;
+        new->lastp = f->lastp;
+        new->firstp = f->firstp;
+        words[index] = new;
+    }
+}
+
 link_ele **resize_link(link_ele **words, int *size)
 {
     int newsize = 2 * (*size);
@@ -1655,8 +1786,14 @@ link_ele **resize_link(link_ele **words, int *size)
     {
         if (words[i] != NULL)
         {
-            int index = hash_function(words[i]->word, newsize);
-            words_temp[index] = words[i];
+            link_ele *actual = words[i];
+            add_ele_resize(words_temp, actual, newsize);
+            while (actual->next != NULL)
+            {
+                actual = actual->next;
+                add_ele_resize(words_temp, actual, newsize);
+                
+            }
         }
     }
     *size = 2 * (*size);
@@ -1777,6 +1914,18 @@ int get_info_node_all(tree_node **words, int size)
 {
     int c_stored = 0;
     count_diff = 0;
+    FILE *f_node_all = fopen("results_fna.txt", "a+");
+    if (f_node_all == NULL)
+    {
+        printf("Erro a abrir o ficheiro escrita!\n");
+        exit(1);
+    }
+    else
+    {
+        printf("%s\n", "Aberto ficheiro results_fna.txt");
+    }
+
+    fprintf(f_node_all, "Word \t Count \t FPos \t LPos \t Dmin \t AvgD \t Dmax \n");
     bool found = false;
     for (int i = 0; i < size; i++)
     {
@@ -1798,6 +1947,7 @@ int get_info_node_all(tree_node **words, int size)
                     printf("\nPosition (related to the distinct word counter):\n");
                     printf("First: %ld\n", actual->firstp);
                     printf("Last: %ld\n", actual->lastp);
+                    fprintf(f_node_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
                     if (actual->count > 1)
                     {
                         printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
@@ -1808,10 +1958,12 @@ int get_info_node_all(tree_node **words, int size)
                         printf("Smallest: %ld\n", actual->dmin);
                         printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
                         printf("Largest: %ld\n\n", actual->dmax);
+                        fprintf(f_node_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
                     }
                     else
                     {
                         printf("\n No distances stats available.\n\n");
+                        fprintf(f_node_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                     }
                     found = true;
                     actual = actual->right;
@@ -1847,6 +1999,8 @@ int get_info_node_all(tree_node **words, int size)
                         printf("\nPosition (related to the distinct word counter):\n");
                         printf("First: %ld\n", actual->firstp);
                         printf("Last: %ld\n", actual->lastp);
+                        fprintf(f_node_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
+                    
                         if (actual->count > 1)
                         {
                             printf("\nDistances beetween consecutive occurrences (related to the index position of all the text):\n");
@@ -1857,10 +2011,13 @@ int get_info_node_all(tree_node **words, int size)
                             printf("Smallest: %ld\n", actual->dmin);
                             printf("Average: %.2f\n", (float)(actual->tdist) / (actual->count - 1));
                             printf("Largest: %ld\n\n", actual->dmax);
+                            fprintf(f_node_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
+                    
                         }
                         else
                         {
                             printf("\n No distances stats available.\n\n");
+                            fprintf(f_node_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                         }
                         found = true;
                         actual = actual->right;
@@ -1882,6 +2039,7 @@ int get_info_link_all(link_ele **words, int size, bool all)
     bool found = false;
     int c_st = 0;
     count_diff = 0;
+    FILE *f_link_all = fopen("results_fla.txt", "a+");
     if (all == true)
         goto all;
     char name[64];
@@ -1928,6 +2086,19 @@ int get_info_link_all(link_ele **words, int size, bool all)
     else
     {
     all:
+
+        if (f_link_all == NULL)
+        {
+            printf("Erro a abrir o ficheiro escrita!\n");
+            exit(1);
+        }
+        else
+        {
+            printf("%s\n", "Aberto ficheiro results_fla.txt");
+        }
+
+        fprintf(f_link_all, "Word \t Count \t FPos \t LPos \t Dmin \t AvgD \t Dmax \n");
+
         for (int i = 0; i < size; i++)
         {
             link_ele *actual = words[i];
@@ -1936,6 +2107,7 @@ int get_info_link_all(link_ele **words, int size, bool all)
                 found = true;
                 c_st += actual->count;
                 count_diff++;
+                fprintf(f_link_all, "%s \t %ld \t %ld \t %ld \t ", actual->word, actual->count, actual->first, actual->last);
                 printf("\nInformation about word '%s'\n", actual->word);
                 printf("\nCount: %ld\n", actual->count);
                 printf("\nPosition (related to the index position of all the text):\n");
@@ -1954,15 +2126,19 @@ int get_info_link_all(link_ele **words, int size, bool all)
                     printf("Smallest: %ld\n", actual->dmin);
                     printf("Average: %2f\n", (float)(actual->tdist) / (actual->count - 1));
                     printf("Largest: %ld\n\n", actual->dmax);
+
+                    fprintf(f_link_all, "%ld \t %.2f \t %ld \n ", actual->dmin, (float)(actual->tdist) / (actual->count - 1), actual->dmax);
                 }
                 else
                 {
+                    fprintf(f_link_all, "%d \t %.2f \t %d \n ", 0, 0.00, 0);
                     printf("\nNo distances stats available.\n\n");
                 }
 
                 actual = actual->next;
             }
         }
+        fclose(f_link_all);
     }
     if (!found)
     {
@@ -2052,7 +2228,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words = resize_link(words, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words, f, s_hash);
             }
@@ -2173,7 +2348,6 @@ int main(int argc, char *argv[])
 
         reset_time();
 
-
         printf("\nPrinting all words stored...\n");
         (void)elapsed_time();
         usleep(5000000);
@@ -2196,7 +2370,6 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable OBT Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable OBT Time Travel Print \t %.6f \n", cpu_time);
-
         }
 
         free(words);
@@ -2221,7 +2394,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words1 = resize_link(words1, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words1, f1, s_hash);
             }
@@ -2274,22 +2446,18 @@ int main(int argc, char *argv[])
             fprintf(fw, "HashTable LL Words Stored \t %d \n", count_stored);
             fprintf(fw, "%s %d \n", "Number of different word", count_diff);
             fprintf(fw, "HashTable LL Time Travel Print \t %.6f \n", cpu_time);
-
-
         }
-
 
         fclose(fw);
         free(words1);
         free(f1);
-
-
     }
     else
     {
         usage(argv);
     }
 }
+
 \end{lstlisting}
 
 \end{document}
