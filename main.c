@@ -823,7 +823,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words = resize_link(words, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words, f, s_hash);
             }
@@ -990,7 +989,6 @@ int main(int argc, char *argv[])
                 if ((double)count_array / s_hash >= 0.8)
                 {
                     words1 = resize_link(words1, &s_hash);
-                    count_array = 0;
                 }
                 add_ele(words1, f1, s_hash);
             }
