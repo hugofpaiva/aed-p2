@@ -44,6 +44,6 @@ All the details, including the results, can be found in the [Work Report](/relat
  - **[João Laranjo](https://github.com/joaolaranjo) - 91153**
  
 ## Grade
-Evaluated with **16** out of 20.
+Evaluated with **19** out of 20.
 
 
